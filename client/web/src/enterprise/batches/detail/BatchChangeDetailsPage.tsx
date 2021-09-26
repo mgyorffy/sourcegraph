@@ -68,8 +68,6 @@ export const BatchChangeDetailsPage: React.FunctionComponent<BatchChangeDetailsP
             // requests; this is necessary for `refetch` to actually use the network. (see
             // https://github.com/apollographql/apollo-client/issues/5515)
             nextFetchPolicy: 'network-only',
-            // TODO: Why do we need to poll this every 5 seconds??
-            // pollInterval: 5000,
         }
     )
 
@@ -133,9 +131,6 @@ export const BatchChangeDetailsPage: React.FunctionComponent<BatchChangeDetailsP
                 className="mb-3"
             />
             <Description description={batchChange.description} />
-            <button className="btn btn-outline-secondary btn-sm" onClick={() => refetch()} type="button">
-                Refetch
-            </button>
             <BatchChangeDetailsTabs batchChange={batchChange} refetchBatchChange={refetch} {...props} />
         </>
     )
