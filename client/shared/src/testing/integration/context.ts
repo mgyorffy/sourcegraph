@@ -101,8 +101,6 @@ export const createSharedIntegrationTestContext = async <
     directory,
 }: IntegrationTestOptions): Promise<IntegrationTestContext<TGraphQlOperations, TGraphQlOperationNames>> => {
     await driver.newPage()
-    // Create every new document with empty `localStorage`: https://github.com/puppeteer/puppeteer/issues/1607
-    await driver.page.evaluateOnNewDocument(() => localStorage.clear())
 
     const recordingsDirectory = path.join(directory, '__fixtures__', snakeCase(currentTest.fullTitle()))
     if (record) {
