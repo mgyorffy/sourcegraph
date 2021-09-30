@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/sourcegraph/sourcegraph/cmd/frontend/enterprise"
 	"github.com/sourcegraph/sourcegraph/cmd/frontend/shared"
 	"github.com/sourcegraph/sourcegraph/internal/authz"
@@ -15,6 +17,8 @@ func main() {
 	// Set dummy authz provider to unblock channel for checking permissions in GraphQL APIs.
 	// See https://github.com/sourcegraph/sourcegraph/issues/3847 for details.
 	authz.SetProviders(true, []authz.Provider{})
+
+	fmt.Println("trigger build")
 
 	shared.Main(func(db dbutil.DB, outOfBandMigrationRunner *oobmigration.Runner) enterprise.Services {
 		return enterprise.DefaultServices()
