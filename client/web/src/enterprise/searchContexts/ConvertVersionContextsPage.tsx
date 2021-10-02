@@ -14,6 +14,7 @@ import { VersionContext } from '../../schema/site.schema'
 import { SearchContextProps } from '../../search'
 
 import { ConvertVersionContextNode } from './ConvertVersionContextNode'
+import styles from './ConvertVersionContextsPage.module.scss'
 
 export interface ConvertVersionContextsPageProps
     extends Pick<SearchContextProps, 'convertVersionContextToSearchContext' | 'isSearchContextSpecAvailable'> {
@@ -121,7 +122,7 @@ export const ConvertVersionContextsPage: React.FunctionComponent<ConvertVersionC
                     <PageTitle title="Convert version contexts" />
                     <div className="convert-version-contexts-page">
                         <Link to="/contexts">
-                            « <span className="convert-version-contexts-page__back-label">Back</span>
+                            « <span className={styles.backLabel}>Back</span>
                         </Link>
                         <div className="page-header d-flex flex-wrap align-items-center mt-2">
                             <h2 className="flex-grow-1">Convert version contexts</h2>

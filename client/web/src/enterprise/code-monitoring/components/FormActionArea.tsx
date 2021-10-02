@@ -11,6 +11,8 @@ import { AuthenticatedUser } from '../../../auth'
 import { CodeMonitorFields, MonitorEmailPriority } from '../../../graphql-operations'
 import { triggerTestEmailAction } from '../backend'
 
+import styles from './FormActionArea.module.scss'
+
 interface ActionAreaProps {
     actions: CodeMonitorFields['actions']
     actionsCompleted: boolean
@@ -171,12 +173,14 @@ export const FormActionArea: React.FunctionComponent<ActionAreaProps> = ({
                             </button>
                         )}
                         {!description && (
-                            <div className="action-area__test-action-error mt-2">
+                            <div className={classNames('mt-2', styles.testActionError)}>
                                 Please provide a name for the code monitor before sending a test
                             </div>
                         )}
                         {isErrorLike(triggerTestEmailResult) && (
-                            <div className="action-area__test-action-error mt-2">{triggerTestEmailResult.message}</div>
+                            <div className={classNames('mt-2', styles.testActionError)}>
+                                {triggerTestEmailResult.message}
+                            </div>
                         )}
                     </div>
                     <div className="d-flex align-items-center my-4">

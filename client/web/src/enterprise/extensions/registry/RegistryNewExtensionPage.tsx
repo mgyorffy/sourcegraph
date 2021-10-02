@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import * as H from 'history'
 import AddIcon from 'mdi-react/AddIcon'
 import HelpCircleOutline from 'mdi-react/HelpCircleOutlineIcon'
@@ -27,6 +28,7 @@ import { RegistryExtensionNameFormGroup, RegistryPublisherFormGroup } from '../e
 
 import { queryViewerRegistryPublishers } from './backend'
 import { RegistryAreaPageProps } from './RegistryArea'
+import styles from './RegistryNewExtensionPage.module.scss'
 
 function createExtension(
     publisher: Scalars['ID'],
@@ -201,7 +203,7 @@ export const RegistryNewExtensionPage = withAuthenticatedUser(
                                     </label>
                                     <code
                                         id="extension-registry-create-extension-page__extensionID"
-                                        className="registry-new-extension-page__extension-id mt-1"
+                                        className={classNames('mt-1', styles.extensionId)}
                                     >
                                         <strong>{extensionID}</strong>
                                     </code>

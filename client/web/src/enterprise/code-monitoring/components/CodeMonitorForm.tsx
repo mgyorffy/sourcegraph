@@ -1,4 +1,4 @@
-import classnames from 'classnames'
+import classNames from 'classnames'
 import * as H from 'history'
 import { isEqual } from 'lodash'
 import React, { useCallback, useMemo, useState } from 'react'
@@ -15,6 +15,7 @@ import { AuthenticatedUser } from '../../../auth'
 import { CodeMonitorFields } from '../../../graphql-operations'
 import { deleteCodeMonitor as _deleteCodeMonitor } from '../backend'
 
+import styles from './CodeMonitorForm.module.scss'
 import { DeleteMonitorModal } from './DeleteMonitorModal'
 import { FormActionArea } from './FormActionArea'
 import { FormTriggerArea } from './FormTriggerArea'
@@ -181,7 +182,7 @@ export const CodeMonitorForm: React.FunctionComponent<CodeMonitorFormProps> = ({
                         <label htmlFor="code-monitor-form-owner">Owner</label>
                         <select
                             id="code-monitor-form-owner"
-                            className="form-control mb-2 code-monitor-form__owner-dropdown w-auto"
+                            className={classNames('form-control mb-2 w-auto', styles.ownerDropdown)}
                             disabled={true}
                         >
                             <option value={authenticatedUser.displayName || authenticatedUser.username}>
@@ -193,7 +194,7 @@ export const CodeMonitorForm: React.FunctionComponent<CodeMonitorFormProps> = ({
                             individual owners.
                         </small>
                     </div>
-                    <hr className="code-monitor-form__horizontal-rule my-3" />
+                    <hr className={classNames('my-3', styles.horizontalRule)} />
                     <div className="code-monitor-form__triggers mb-4">
                         <FormTriggerArea
                             query={currentCodeMonitorState.trigger.query}
@@ -204,8 +205,8 @@ export const CodeMonitorForm: React.FunctionComponent<CodeMonitorFormProps> = ({
                         />
                     </div>
                     <div
-                        className={classnames({
-                            'code-monitor-form__actions--disabled': !formCompletion.triggerCompleted,
+                        className={classNames({
+                            [styles.actionsDisabled]: !formCompletion.triggerCompleted,
                         })}
                     >
                         <FormActionArea
@@ -218,7 +219,7 @@ export const CodeMonitorForm: React.FunctionComponent<CodeMonitorFormProps> = ({
                             description={currentCodeMonitorState.description}
                         />
                     </div>
-                    <hr className="code-monitor-form__horizontal-rule my-3" />
+                    <hr className={classNames('my-3', styles.horizontalRule)} />
                     <div>
                         <div className="d-flex">
                             <div>
