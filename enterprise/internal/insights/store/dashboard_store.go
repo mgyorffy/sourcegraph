@@ -130,7 +130,7 @@ type DashboardStore interface {
 	GetDashboards(ctx context.Context, args DashboardQueryArgs) ([]*types.Dashboard, error)
 }
 
-func (s *DBDashboardStore) DeleteDashboard(ctx context.Context, id string) error {
+func (s *DBDashboardStore) DeleteDashboard(ctx context.Context, id int64) error {
 	const deleteDashboardSql = `
 	-- source: enterprise/internal/insights/store/dashboard_store.go:DeleteDashboard
 	update dashboard set deleted_at = NOW() where id = %s;

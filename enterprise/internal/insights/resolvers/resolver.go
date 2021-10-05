@@ -65,14 +65,24 @@ func (r *Resolver) Insights(ctx context.Context, args *graphqlbackend.InsightsAr
 
 func (r *Resolver) DeleteInsightsDashboard(ctx context.Context, args *graphqlbackend.DeleteInsightsDashboardArgs) (*graphqlbackend.EmptyResponse, error) {
 	emptyResponse := &graphqlbackend.EmptyResponse{}
-	err := r.dashboardStore.DeleteDashboard(ctx, string(args.Id))
+
+	dashboardID, err := unmarshal(args.Id)
+	if err != nil {
+		return emptyResponse, err
+	}
+
+	// TODO: Would it be conventional to ignore this request, or send an error, or some other kind of response?
+	if dashboardID.isVirtualized() {
+		return emptyResponse, nil
+	}
+
+	err = r.dashboardStore.DeleteDashboard(ctx, dashboardID.Arg)
 	if err != nil {
 		return emptyResponse, err
 	}
 
 	return emptyResponse, nil
 }
-
 
 func (r *Resolver) InsightDashboards(ctx context.Context, args *graphqlbackend.InsightDashboardsArgs) (graphqlbackend.InsightsDashboardConnectionResolver, error) {
 	return &dashboardConnectionResolver{
