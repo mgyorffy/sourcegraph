@@ -5,6 +5,9 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/cockroachdb/errors"
+	"github.com/keegancsmith/sqlf"
+
 	"github.com/sourcegraph/sourcegraph/internal/database/basestore"
 	"github.com/sourcegraph/sourcegraph/internal/database/dbutil"
 )
@@ -32,4 +35,17 @@ func (s *DashboardStore) With(other *DashboardStore) *DashboardStore {
 func (s *DashboardStore) Transact(ctx context.Context) (*DashboardStore, error) {
 	txBase, err := s.Store.Transact(ctx)
 	return &DashboardStore{Store: txBase, Now: s.Now}, err
+}
+
+func (s *DashboardStore) DeleteDashboard(ctx context.Context, id string) error {
+	const deleteDashboardSql = `
+	-- source: enterprise/internal/insights/store/dashboard_store.go:DeleteDashboard
+	update dashboard set deleted_at = NOW() where id = %s;
+	`
+
+	err := s.Exec(ctx, sqlf.Sprintf(deleteDashboardSql, id))
+	if err != nil {
+		return errors.Wrapf(err, "failed to delete dashboard with id: %s", id)
+	}
+	return nil
 }

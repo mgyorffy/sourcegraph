@@ -23,6 +23,7 @@ type Resolver struct {
 	insightsStore        store.Interface
 	workerBaseStore      *basestore.Store
 	insightMetadataStore store.InsightMetadataStore
+	dashboardStore       *store.DashboardStore
 }
 
 // New returns a new Resolver whose store uses the given Timescale and Postgres DBs.
@@ -37,6 +38,7 @@ func newWithClock(timescale, postgres dbutil.DB, clock func() time.Time) *Resolv
 		insightsStore:        store.NewWithClock(timescale, store.NewInsightPermissionStore(postgres), clock),
 		workerBaseStore:      basestore.NewWithDB(postgres, sql.TxOptions{}),
 		insightMetadataStore: store.NewInsightStore(timescale),
+		dashboardStore:       store.NewDashboardStore(timescale),
 	}
 }
 
@@ -57,6 +59,16 @@ func (r *Resolver) Insights(ctx context.Context, args *graphqlbackend.InsightsAr
 	}, nil
 }
 
+func (r *Resolver) DeleteInsightsDashboard(ctx context.Context, args *graphqlbackend.DeleteInsightsDashboardArgs) (*graphqlbackend.EmptyResponse, error) {
+	emptyResponse := &graphqlbackend.EmptyResponse{}
+	err := r.dashboardStore.DeleteDashboard(ctx, string(args.Id))
+	if err != nil {
+		return emptyResponse, err
+	}
+
+	return emptyResponse, nil
+}
+
 type disabledResolver struct {
 	reason string
 }
@@ -66,5 +78,9 @@ func NewDisabledResolver(reason string) graphqlbackend.InsightsResolver {
 }
 
 func (r *disabledResolver) Insights(ctx context.Context, args *graphqlbackend.InsightsArgs) (graphqlbackend.InsightConnectionResolver, error) {
+	return nil, errors.New(r.reason)
+}
+
+func (r *disabledResolver) DeleteInsightsDashboard(ctx context.Context, args *graphqlbackend.DeleteInsightsDashboardArgs) (*graphqlbackend.EmptyResponse, error) {
 	return nil, errors.New(r.reason)
 }

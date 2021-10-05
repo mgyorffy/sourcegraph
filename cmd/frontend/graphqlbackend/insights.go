@@ -14,7 +14,15 @@ import (
 
 // InsightsResolver is the root resolver.
 type InsightsResolver interface {
+	// Queries
 	Insights(ctx context.Context, args *InsightsArgs) (InsightConnectionResolver, error)
+
+	// Mutations
+	DeleteInsightsDashboard(ctx context.Context, args *DeleteInsightsDashboardArgs) (*EmptyResponse, error)
+}
+
+type DeleteInsightsDashboardArgs struct {
+	Id graphql.ID
 }
 
 type InsightsArgs struct {
