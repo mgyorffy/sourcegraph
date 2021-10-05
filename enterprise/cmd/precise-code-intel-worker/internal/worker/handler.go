@@ -8,6 +8,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/sourcegraph/sourcegraph/cmd/gitserver/domain"
+
 	"github.com/cockroachdb/errors"
 	"github.com/honeycombio/libhoney-go"
 	"github.com/inconshreveable/log15"
@@ -20,7 +22,6 @@ import (
 	"github.com/sourcegraph/sourcegraph/internal/api"
 	"github.com/sourcegraph/sourcegraph/internal/honey"
 	"github.com/sourcegraph/sourcegraph/internal/trace"
-	"github.com/sourcegraph/sourcegraph/internal/vcs"
 	"github.com/sourcegraph/sourcegraph/internal/workerutil"
 	dbworkerstore "github.com/sourcegraph/sourcegraph/internal/workerutil/dbworker/store"
 	"github.com/sourcegraph/sourcegraph/lib/codeintel/lsif/conversion"
@@ -207,7 +208,7 @@ func requeueIfCloning(ctx context.Context, workerStore dbworkerstore.Store, uplo
 	}
 
 	if _, err := backend.Repos.ResolveRev(ctx, repo, upload.Commit); err != nil {
-		if !vcs.IsCloneInProgress(err) {
+		if !domain.IsCloneInProgress(err) {
 			return false, errors.Wrap(err, "Repos.ResolveRev")
 		}
 
