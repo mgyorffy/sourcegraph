@@ -2,10 +2,21 @@ import classNames from 'classnames'
 import * as H from 'history'
 import * as React from 'react'
 
+import { LoaderInput } from '@sourcegraph/branded/src/components/LoaderInput'
+import { deriveInputClassName, InputValidationState } from '@sourcegraph/shared/src/util/useInputValidation'
+
 import { USERNAME_MAX_LENGTH, VALID_USERNAME_REGEXP } from '../user'
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     inputRef?: React.Ref<HTMLInputElement>
+}
+
+interface SignupEmailField {
+    emailState: InputValidationState
+    loading: boolean
+    label: string
+    nextEmailFieldChange: (changeEvent: React.ChangeEvent<HTMLInputElement>) => void
+    emailInputReference: React.Ref<HTMLInputElement>
 }
 
 export const PasswordInput: React.FunctionComponent<InputProps> = props => {
@@ -60,6 +71,38 @@ export const UsernameInput: React.FunctionComponent<InputProps> = props => {
         />
     )
 }
+
+export const SignupEmailField: React.FunctionComponent<SignupEmailField> = ({
+    emailState,
+    loading,
+    label,
+    nextEmailFieldChange,
+    emailInputReference,
+}) => (
+    <div className="form-group d-flex flex-column align-content-start">
+        <label
+            htmlFor="email"
+            className={classNames('align-self-start', {
+                'text-danger font-weight-bold': emailState.kind === 'INVALID',
+            })}
+        >
+            {label}
+        </label>
+        <LoaderInput className={classNames(deriveInputClassName(emailState))} loading={emailState.kind === 'LOADING'}>
+            <EmailInput
+                className={deriveInputClassName(emailState)}
+                onChange={nextEmailFieldChange}
+                required={true}
+                value={emailState.value}
+                disabled={loading}
+                autoFocus={true}
+                placeholder=" "
+                inputRef={emailInputReference}
+            />
+        </LoaderInput>
+        {emailState.kind === 'INVALID' && <small className="invalid-feedback">{emailState.reason}</small>}
+    </div>
+)
 
 /**
  * Returns the sanitized return-to relative URL (including only the path, search, and fragment).

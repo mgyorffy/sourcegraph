@@ -18,14 +18,14 @@ import {
 
 import { ErrorAlert } from '../components/alerts'
 import { LoaderButton } from '../components/LoaderButton'
+import { FeatureFlagProps } from '../featureFlags/featureFlags'
 import { SourcegraphContext } from '../jscontext'
 import { ANONYMOUS_USER_ID_KEY, eventLogger, FIRST_SOURCE_URL_KEY } from '../tracking/eventLogger'
 import { enterpriseTrial, signupTerms } from '../util/features'
 
 import { OrDivider } from './OrDivider'
-import { EmailInput, PasswordInput, UsernameInput } from './SignInSignUpCommon'
+import { PasswordInput, SignupEmailField, UsernameInput } from './SignInSignUpCommon'
 import signInSignUpCommonStyles from './SignInSignUpCommon.module.scss'
-
 export interface SignUpArguments {
     email: string
     username: string
@@ -35,7 +35,7 @@ export interface SignUpArguments {
     firstSourceUrl?: string
 }
 
-interface SignUpFormProps {
+interface SignUpFormProps extends FeatureFlagProps {
     className?: string
 
     /** Called to perform the signup on the server. */
@@ -54,6 +54,7 @@ const preventDefault = (event: React.FormEvent): void => event.preventDefault()
  * The form for creating an account
  */
 export const SignUpForm: React.FunctionComponent<SignUpFormProps> = ({
+    featureFlags,
     onSignUp,
     buttonLabel,
     className,
@@ -150,32 +151,15 @@ export const SignUpForm: React.FunctionComponent<SignUpFormProps> = ({
                 onSubmit={handleSubmit}
                 noValidate={true}
             >
-                <div className="form-group d-flex flex-column align-content-start">
-                    <label
-                        htmlFor="email"
-                        className={classNames('align-self-start', {
-                            'text-danger font-weight-bold': emailState.kind === 'INVALID',
-                        })}
-                    >
-                        Email
-                    </label>
-                    <LoaderInput
-                        className={classNames(deriveInputClassName(emailState))}
-                        loading={emailState.kind === 'LOADING'}
-                    >
-                        <EmailInput
-                            className={deriveInputClassName(emailState)}
-                            onChange={nextEmailFieldChange}
-                            required={true}
-                            value={emailState.value}
-                            disabled={loading}
-                            autoFocus={true}
-                            placeholder=" "
-                            inputRef={emailInputReference}
-                        />
-                    </LoaderInput>
-                    {emailState.kind === 'INVALID' && <small className="invalid-feedback">{emailState.reason}</small>}
-                </div>
+                {!featureFlags.get('signup-optimisation') && (
+                    <SignupEmailField
+                        label="Email"
+                        loading={loading}
+                        nextEmailFieldChange={nextEmailFieldChange}
+                        emailState={emailState}
+                        emailInputReference={emailInputReference}
+                    />
+                )}
                 <div className="form-group d-flex flex-column align-content-start">
                     <label
                         htmlFor="username"
@@ -205,6 +189,15 @@ export const SignUpForm: React.FunctionComponent<SignUpFormProps> = ({
                         </small>
                     )}
                 </div>
+                {featureFlags.get('signup-optimisation') && (
+                    <SignupEmailField
+                        label="Email address"
+                        loading={loading}
+                        nextEmailFieldChange={nextEmailFieldChange}
+                        emailState={emailState}
+                        emailInputReference={emailInputReference}
+                    />
+                )}
                 <div className="form-group d-flex flex-column align-content-start">
                     <label
                         htmlFor="password"

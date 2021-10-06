@@ -8,12 +8,13 @@ import { TelemetryProps } from '@sourcegraph/shared/src/telemetry/telemetryServi
 import { ThemeProps } from '@sourcegraph/shared/src/theme'
 
 import { BrandLogo } from '../components/branding/BrandLogo'
+import { FeatureFlagProps } from '../featureFlags/featureFlags'
 import { SourcegraphContext } from '../jscontext'
 
 import styles from './CloudSignUpPage.module.scss'
 import { SignUpArguments, SignUpForm } from './SignUpForm'
 
-interface Props extends ThemeProps, TelemetryProps {
+interface Props extends ThemeProps, TelemetryProps, FeatureFlagProps {
     source: string | null
     showEmailForm: boolean
     /** Called to perform the signup on the server. */
@@ -45,6 +46,7 @@ export const CloudSignUpPage: React.FunctionComponent<Props> = ({
     onSignUp,
     context,
     telemetryService,
+    featureFlags,
 }) => {
     const location = useLocation()
 
@@ -123,7 +125,58 @@ export const CloudSignUpPage: React.FunctionComponent<Props> = ({
 
                 <div className={styles.signUpWrapper}>
                     <h2>Create a free account</h2>
-                    {!showEmailForm ? (
+                    {featureFlags.get('signup-optimisation') ? (
+                        <>
+                            <SignUpForm
+                                featureFlags={featureFlags}
+                                onSignUp={args => {
+                                    logEvent()
+                                    return onSignUp(args)
+                                }}
+                                context={{ authProviders: [], sourcegraphDotComMode: true }}
+                                buttonLabel="Sign up"
+                                experimental={true}
+                                className="my-3"
+                            />
+                            <div className="d-flex justify-content-center">
+                                <span className="mr-1"> Have an account?</span>
+                                <Link to={`/sign-in${location.search}`}> Log in</Link>
+                            </div>
+
+                            <div className="d-flex align-items-center justify-content-center my-4">
+                                <hr className="flex-grow-1" />
+                                <p className="mx-2 my-0">or</p>
+                                <hr className="flex-grow-1" />
+                            </div>
+
+                            {githubProvider && (
+                                <a
+                                    href={maybeRedirectToWelcome(githubProvider.authenticationURL)}
+                                    className={classNames(
+                                        'd-flex justify-content-center',
+                                        styles.signUpButton,
+                                        styles.githubButton
+                                    )}
+                                    onClick={logEvent}
+                                >
+                                    <GithubIcon className="mr-3" /> Sign up with GitHub
+                                </a>
+                            )}
+                            {gitlabProvider && (
+                                <a
+                                    href={maybeRedirectToWelcome(gitlabProvider.authenticationURL)}
+                                    className={classNames(
+                                        'd-flex justify-content-center',
+                                        styles.signUpButton,
+                                        styles.gitlabButton
+                                    )}
+                                    onClick={logEvent}
+                                >
+                                    <GitlabColorIcon className="mr-3" /> Sign up with GitLab
+                                </a>
+                            )}
+                        </>
+                    ) : !showEmailForm ? (
                         <>
                             {githubProvider && (
                                 <a
@@ -164,6 +217,7 @@ export const CloudSignUpPage: React.FunctionComponent<Props> = ({
                             </small>
 
                             <SignUpForm
+                                featureFlags={featureFlags}
                                 onSignUp={args => {
                                     logEvent()
                                     return onSignUp(args)
@@ -188,11 +242,15 @@ export const CloudSignUpPage: React.FunctionComponent<Props> = ({
                         .
                     </small>
 
-                    <hr className={styles.separator} />
+                    {!featureFlags.get('signup-optimisation') && (
+                        <>
+                            <hr className={styles.separator} />
 
-                    <div>
-                        Already have an account? <Link to={`/sign-in${location.search}`}>Log in</Link>
-                    </div>
+                            <div>
+                                Already have an account? <Link to={`/sign-in${location.search}`}>Log in</Link>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
