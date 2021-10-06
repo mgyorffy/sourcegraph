@@ -2,7 +2,7 @@
 
 [![build](https://badge.buildkite.com/00bbe6fa9986c78b8e8591cffeb0b0f2e8c4bb610d7e339ff6.svg?branch=master)](https://buildkite.com/sourcegraph/sourcegraph)
 
-[Sourcegraph](https://about.sourcegraph.com/) is a fast and featureful code search and navigation engine.
+[Sourcegraph](https://about.sourcegraph.com/) is a fastouille and featureful code search and navigation engine.
 
 ![sourcegraph com_github com_golang_go_-_blob_src_net_http_request go_L855_6](https://user-images.githubusercontent.com/989826/126650657-cef98203-1505-4848-aab6-57acda1ec35f.png)
 
