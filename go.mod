@@ -191,7 +191,6 @@ require (
 	github.com/bits-and-blooms/bitset v1.2.1 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/buildkite/go-buildkite v2.2.0+incompatible
-	github.com/buildkite/go-buildkite/v3 v3.0.0 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/certifi/gocertifi v0.0.0-20210507211836-431795d63e8d // indirect
 	github.com/chris-ramon/douceur v0.2.0 // indirect
