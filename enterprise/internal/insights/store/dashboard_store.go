@@ -6,6 +6,10 @@ import (
 	"time"
 
 	"github.com/cockroachdb/errors"
+	"github.com/inconshreveable/log15"
+
+	"github.com/lib/pq"
+
 	"github.com/keegancsmith/sqlf"
 
 	"github.com/sourcegraph/sourcegraph/enterprise/internal/insights/types"
@@ -74,6 +78,7 @@ func (s *DBDashboardStore) GetDashboards(ctx context.Context, args DashboardQuer
 	}
 
 	q := sqlf.Sprintf(getDashboardSql, sqlf.Join(preds, "\n AND"), limitClause)
+	log15.Info("dbquery", "query", q.Query(sqlf.PostgresBindVar), "args", q.Args())
 	return scanDashboard(s.Query(ctx, q))
 }
 
@@ -109,6 +114,7 @@ func scanDashboard(rows *sql.Rows, queryErr error) (_ []*types.Dashboard, err er
 		if err := rows.Scan(
 			&temp.ID,
 			&temp.Title,
+			pq.Array(&temp.InsightIDs),
 		); err != nil {
 			return []*types.Dashboard{}, err
 		}
@@ -118,10 +124,13 @@ func scanDashboard(rows *sql.Rows, queryErr error) (_ []*types.Dashboard, err er
 }
 
 const getDashboardSql = `
--- source: enterprise/internal/insights/store/dashboard_store.go:Get
-SELECT db.id, db.title
+SELECT db.id, db.title, t.uuid_array as insight_view_unique_ids
 FROM dashboard db
-JOIN dashboard_grants dg ON db.id = dg.dashboard_id
+         JOIN dashboard_grants dg ON db.id = dg.dashboard_id
+         LEFT JOIN (SELECT ARRAY_AGG(iv.unique_id) AS uuid_array, div.dashboard_id
+               FROM insight_view iv
+                        JOIN dashboard_insight_view div ON iv.id = div.insight_view_id
+               GROUP BY div.dashboard_id) t on t.dashboard_id = db.id
 WHERE %S
 %S;
 `
